@@ -1,0 +1,41 @@
+-- 1. 如果数据库 bank_db 不存在，则创建它
+CREATE DATABASE IF NOT EXISTS bank_db
+    -- 使用现代且通用的字符集和排序规则，以支持中文等字符
+    CHARACTER SET utf8mb4 
+    COLLATE utf8mb4_unicode_ci;
+
+-- 2. 切换到新创建的数据库，以便后续创建表
+USE bank_db;
+-- 3. 创建 Account 账户表
+CREATE TABLE IF NOT EXISTS account (
+    -- 主键：卡号，作为唯一标识
+    card_number VARCHAR(20) PRIMARY KEY NOT NULL, 
+    
+    -- 登录信息
+    username VARCHAR(50) UNIQUE NOT NULL, -- 用户名必须唯一
+    password_hash VARCHAR(255) NOT NULL, -- 存储密码，您使用的是简化版明文
+    
+    -- 个人信息
+    real_name VARCHAR(50), 
+    phone VARCHAR(20),
+    
+    -- 财务信息：**必须**使用 DECIMAL 来保证金额的精度！
+    balance DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    
+    -- 自动记录创建时间
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+-- 4. 插入测试账户 1: 用于登录和转出
+INSERT INTO account (card_number, username, password_hash, real_name, phone, balance)
+VALUES 
+('1234567890', 'testuser', '123456', '张三', '13800138000', 5000.00); 
+-- 登录信息：用户名: testuser, 密码: 123456, 初始余额: 5000.00
+
+-- 5. 插入测试账户 2: 用于转入（接收方）
+INSERT INTO account (card_number, username, password_hash, real_name, phone, balance)
+VALUES 
+('9876543210', 'receiver', '999999', '李四', '13900139000', 1000.00);
+-- 接收方账户：卡号: 9876543210, 余额: 1000.00
+
+-- 6. 验证数据是否成功插入
+SELECT * FROM account;
